@@ -1,37 +1,24 @@
-import { useState } from 'react';
 import styled from 'styled-components';
-import App from './App';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/free-solid-svg-icons';
+import { useCards } from './context';
+import { Link } from 'react-router-dom';
 
-interface Card {
-    titolo: string;
-    link: string;
-    Boolean: boolean;
-    id: string;
-}
 interface PropsBoolean {
-    boolean: boolean
-}
-
-interface PropsComponente {
-    componente1: boolean
-}
-
-interface PreferitiCards {
-    saveCards: Card[];
-    setCards: (x: Card[]) => void;
+    boolean: boolean;
 }
 
 const FlexButton = styled.div(() => ({
     display: 'flex',
     justifyContent: 'center',
-}))
+}));
 
 const Flex = styled.div(() => ({
     display: 'flex',
     flexWrap: 'wrap',
     '& > *': {
         display: 'flex',
-        justifyContent: 'center', // Modifica per centrare le card
+        justifyContent: 'center',
         flexBasis: 'calc(33.33% - 20px)',
         margin: '0 10px 20px 10px',
     },
@@ -44,28 +31,33 @@ const CardView = styled.div(() => ({
     borderRadius: '10px',
     boxShadow: '0 0 15px rgba(0,0,0,0.07)',
     textAlign: 'center',
-}))
+}));
 
 const Img = styled.div(() => ({
     marginTop: '10px',
-}))
+}));
 
 const IsFavorite = styled.div<PropsBoolean>((props) => ({
     color: props.boolean ? 'yellow' : 'black',
-}))
+}));
 
-const SwitchHome = styled.div<PropsComponente>((props) => ({
-    fontWeight: props.componente1 ? '0' : '900',
-    cursor: props.componente1 ? '0' : 'pointer',
-    marginLeft: props.componente1 ? '0' : '10px',
-}))
+const SwitchHome = styled.div(() => ({
+    fontWeight: '900',
+    cursor: 'pointer',
+    marginRight: '10px',
+}));
 
-const CursorHome = styled.div(() => ({
-    cursor: 'pointer'
-}))
+const StylePreferiti = styled(Link)`
+  font-weight: 900;
+  cursor: pointer;
+  margin-right: 10px;
+  text-decoration: none !important;
+  color:#f0f0f0;
+  margin-top: 16px;
+`;
 
-function Preferiti({ saveCards, setCards }: PreferitiCards) {
-    const [componente1, setComponente1] = useState(false)
+function Preferiti() {
+    const { saveCards, setCards } = useCards();
     function rimuoviDaiPreferiti(id: string) {
         const index = saveCards.findIndex((user) => user.id === id);
         saveCards[index].Boolean = !saveCards[index].Boolean;
@@ -75,36 +67,29 @@ function Preferiti({ saveCards, setCards }: PreferitiCards) {
     }
     return (
         <>
-            {componente1 ? (
-                <App />
-            ) : (
-                <>
-                    <FlexButton>
-                        <CursorHome><p onClick={() => setComponente1(!componente1)}>HOME</p></CursorHome>
-                        <SwitchHome componente1={componente1}><p>PREFERITI</p></SwitchHome>
-                    </FlexButton>
-                    <Flex>
-                        {saveCards.map((card) => (
-                            <p key={card.id}>
-                                {card.Boolean && (
-                                    <>
-                                        <CardView>
-                                            <Img><img src={card.link} alt="" width={'150px'} height={'150px'} /></Img>
-                                            {card.titolo}
-                                            <IsFavorite boolean={card.Boolean}>
-                                                <i onClick={() => rimuoviDaiPreferiti(card.id)} className="fa fa-star"></i>
-                                            </IsFavorite>
-                                        </CardView>
-                                    </>
-                                )}
-                            </p>
-                        ))}
-                    </Flex>
-                </>
-            )}
+            <FlexButton>
+                <StylePreferiti to="/">HOME</StylePreferiti>
+                <SwitchHome><p>PREFERITI</p></SwitchHome>
+            </FlexButton>
+            <Flex>
+                {saveCards.map((card) => (
+                    <p key={card.id}>
+                        {card.Boolean && (
+                            <>
+                                <CardView>
+                                    <Img><img src={card.link} alt="" width={'150px'} height={'150px'} /></Img>
+                                    {card.titolo}
+                                    <IsFavorite boolean={card.Boolean}>
+                                        <FontAwesomeIcon icon={faStar} style={{ fontSize: '12px' }} onClick={() => rimuoviDaiPreferiti(card.id)} />
+                                    </IsFavorite>
+                                </CardView>
+                            </>
+                        )}
+                    </p>
+                ))}
+            </Flex>
         </>
-    );
+    )
 }
 
 export default Preferiti;
-
